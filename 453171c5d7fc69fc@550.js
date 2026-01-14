@@ -9,7 +9,7 @@ function _chart_complete2(world,html,d3,cities,$0,drafting,$1,allData,syncToGoog
   // --- CONFIGURATION ---
   const maxK = 150.0; // Change this to set your maximum zoom level
   const width = window.innerWidth;
-  const height = 500;
+  const height = window.innerHeight;
   const scaleWidth = (width - 40) / (2 * Math.PI); // 40px padding
   const scaleHeight = (height - 40) / Math.PI;
   const dynamicBaseScale = Math.min(scaleWidth, scaleHeight) * 1.41;
