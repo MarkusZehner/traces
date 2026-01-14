@@ -16,13 +16,18 @@ function _2(html) {
   return html`
     <div class="title-wrapper">
       <h1 id="chart-title">Alumni Traces</h1>
+      <p class="chart-description">
+        This visualization tracks the career paths and geographic distribution 
+        of alumni over time. Use the mouse to rotate the globe and explore.
+        Click once to start your own trace. Doubleclick to save the current draft without adding another point.
+        You can use the searchbox to add points!
+      </p>
     </div>
 
     <style>
-      /* 1. Make the 'box' around the title invisible to clicks */
       .observablehq:has(#chart-title) {
         background: transparent !important;
-        pointer-events: none !important; /* Clicks pass through the container */
+        pointer-events: none !important;
         position: relative;
         z-index: -1; 
       }
@@ -32,23 +37,32 @@ function _2(html) {
         top: 0;
         left: 0;
         width: 100vw;
-        pointer-events: none; /* Clicks pass through the title wrapper */
+        pointer-events: none;
+        padding: 20px; /* Moved padding here for better alignment */
       }
+
       #chart-title {
         font-family: sans-serif;
         margin: 0;
-        padding: 20px;
         color: #333; 
         background: transparent;
       }
-      /* 2. Make sure your CHART container is clickable again */
+
+      /* Styling for your small print */
+      .chart-description {
+        font-family: sans-serif;
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 5px;
+        max-width: 400px; /* Keeps text from stretching too wide */
+      }
+
       #chart-container {
-        pointer-events: all !important; /* This brings back interactivity to the globe */
+        pointer-events: all !important;
       }
     </style>
   `;
 }
-
 function _chart_complete2(world,html,d3,cities,$0,drafting,$1,allData,syncToGoogle,alert,topojson,colorScale)
 {
   if (!world) return html`Waiting for world data...`;
