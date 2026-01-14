@@ -1,33 +1,19 @@
-function _1(html){return(
-html`<h1 id="chart-title" style="text-align:center; font-family: sans-serif;">Alumni Traces</h1>`
-)}
-
-function _hideUI(html){return(
+function _hideUI_Robust(html){return(
 html`<style>
-  /* Hide the Observable header and footer */
-  header, footer, .observablehq--footer {
+  /* Hide every cell that doesn't contain a visible input or canvas */
+  .observablehq:not(:has(canvas)):not(:has(input)):not(:has(h1)) {
     display: none !important;
   }
-
-  /* Hide the cell source code and UI controls */
-  .observablehq--cell-controls, 
-  .observablehq--import,
-  .observablehq--source {
+  
+  /* Hide the code 'gutter' and back-links */
+  .observablehq--cite, .observablehq--inspect {
     display: none !important;
-  }
-
-  /* Target everything that ISN'T our specific title or the chart container */
-  /* This hides all other standard text/markdown cells */
-  div.observablehq:not(:has(#chart-title)):not(:has(#chart-container)) {
-    display: none !important;
-  }
-
-  /* Remove padding from the main body to let the canvas fill the screen */
-  .observablehq {
-    margin: 0 !important;
-    max-width: none !important;
   }
 </style>`
+)}
+
+function _2(html){return(
+html`<h1 id="chart-title" style="text-align:center; font-family: sans-serif;">Alumni Traces</h1>`
 )}
 
 function _chart_complete2(world,html,d3,cities,$0,drafting,$1,allData,syncToGoogle,alert,topojson,colorScale)
@@ -745,8 +731,8 @@ export default function define(runtime, observer) {
     ["worldcities.csv", {url: new URL("./files/fedc9dff008f4b3fb5a4e10c88851f20900d71bcfd50f9d440121ae5b57b598f14da9d21b0a3695a83b047f5c666759020ea7c8d46a00a8232ddf0a5d6685205.csv", import.meta.url), mimeType: "text/csv", toString}]
   ]);
   main.builtin("FileAttachment", runtime.fileAttachments(name => fileAttachments.get(name)));
-  main.variable(observer()).define(["html"], _1);
-  main.variable(observer("hideUI")).define("hideUI", ["html"], _hideUI);
+  main.variable(observer("hideUI_Robust")).define("hideUI_Robust", ["html"], _hideUI_Robust);
+  main.variable(observer()).define(["html"], _2);
   main.variable(observer("chart_complete2")).define("chart_complete2", ["world","html","d3","cities","mutable drafting","drafting","mutable allData","allData","syncToGoogle","alert","topojson","colorScale"], _chart_complete2);
   main.variable(observer("viewof savedTable")).define("viewof savedTable", ["allData","html","d3"], _savedTable);
   main.variable(observer("savedTable")).define("savedTable", ["Generators", "viewof savedTable"], (G, _) => G.input(_));
