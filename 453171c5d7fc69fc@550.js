@@ -77,11 +77,11 @@ function _chart_complete2(world,html,d3,cities,$0,drafting,$1,allData,syncToGoog
 
   // 1. Use a more reliable width/height for embedded notebooks
   const width = document.body.clientWidth || window.innerWidth;
-  const height = (window.innerHeight - 80) || 600;
+  const height = (window.innerHeight) || 600;
 
   // 2. Standard D3 scaling logic:
   // The 0.9 provides a 10% safety margin so it doesn't touch the edges
-  const dynamicBaseScale = Math.min(width, height) / 2 / Math.PI * 2;
+  const dynamicBaseScale = Math.min(width, height) / 2 / Math.PI * 1.7;
 
   // 1. Setup Persistent State
   const state = (this && this.value) ? this.value : { 
@@ -190,7 +190,7 @@ item.on("click", () => {
   // 3. Trigger the Year Popup at the center of the screen
   // Since we just rotated the city to the center, we open the popup there.
   const centerX = width / 2;
-  const centerY = height / 2 - 80; // Your projection's vertical center
+  const centerY = height / 2; // Your projection's vertical center
   
   showYearPopupForSearch(centerX, centerY, city);
 });
@@ -211,7 +211,7 @@ item.on("click", () => {
   context.scale(dpr, dpr);
 
 
-  const yOffset = 40; // Adjust this number until the sphere sits perfectly
+  const yOffset = 0; // Adjust this number until the sphere sits perfectly
   // 2. Projection Setup
   let projection = d3.geoMollweide()
     .scale(dynamicBaseScale * state.k) 
