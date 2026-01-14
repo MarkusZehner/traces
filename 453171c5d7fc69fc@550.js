@@ -1,5 +1,33 @@
-function _1(md){return(
-md`# Alumni traces`
+function _1(html){return(
+html`<h1 id="chart-title" style="text-align:center; font-family: sans-serif;">Alumni Traces</h1>`
+)}
+
+function _hideUI(html){return(
+html`<style>
+  /* Hide the Observable header and footer */
+  header, footer, .observablehq--footer {
+    display: none !important;
+  }
+
+  /* Hide the cell source code and UI controls */
+  .observablehq--cell-controls, 
+  .observablehq--import,
+  .observablehq--source {
+    display: none !important;
+  }
+
+  /* Target everything that ISN'T our specific title or the chart container */
+  /* This hides all other standard text/markdown cells */
+  div.observablehq:not(:has(#chart-title)):not(:has(#chart-container)) {
+    display: none !important;
+  }
+
+  /* Remove padding from the main body to let the canvas fill the screen */
+  .observablehq {
+    margin: 0 !important;
+    max-width: none !important;
+  }
+</style>`
 )}
 
 function _chart_complete2(world,html,d3,cities,$0,drafting,$1,allData,syncToGoogle,alert,topojson,colorScale)
@@ -9,7 +37,7 @@ function _chart_complete2(world,html,d3,cities,$0,drafting,$1,allData,syncToGoog
   // --- CONFIGURATION ---
   const maxK = 150.0; // Change this to set your maximum zoom level
   const width = window.innerWidth;
-  const height = window.innerHeight;
+  const height = window.innerHeight - 80;
   const scaleWidth = (width - 40) / (2 * Math.PI); // 40px padding
   const scaleHeight = (height - 40) / Math.PI;
   const dynamicBaseScale = Math.min(scaleWidth, scaleHeight) * 1.41;
@@ -25,6 +53,7 @@ function _chart_complete2(world,html,d3,cities,$0,drafting,$1,allData,syncToGoog
   const dpr = window.devicePixelRatio || 1;
   
   const container = d3.create("div")
+    .attr("id", "chart-container") // Add this line
     .style("position", "relative")
     .style("width", `${width}px`)
     .style("height", `${height}px`)
@@ -621,7 +650,7 @@ function _savedTable(allData,html,d3)
 }
 
 
-function _4(DOM,allData){return(
+function _5(DOM,allData){return(
 DOM.download(
   new Blob([JSON.stringify(allData, null, 2)], {type: "application/json"}), 
   "traces.json", 
@@ -716,11 +745,12 @@ export default function define(runtime, observer) {
     ["worldcities.csv", {url: new URL("./files/fedc9dff008f4b3fb5a4e10c88851f20900d71bcfd50f9d440121ae5b57b598f14da9d21b0a3695a83b047f5c666759020ea7c8d46a00a8232ddf0a5d6685205.csv", import.meta.url), mimeType: "text/csv", toString}]
   ]);
   main.builtin("FileAttachment", runtime.fileAttachments(name => fileAttachments.get(name)));
-  main.variable(observer()).define(["md"], _1);
+  main.variable(observer()).define(["html"], _1);
+  main.variable(observer("hideUI")).define("hideUI", ["html"], _hideUI);
   main.variable(observer("chart_complete2")).define("chart_complete2", ["world","html","d3","cities","mutable drafting","drafting","mutable allData","allData","syncToGoogle","alert","topojson","colorScale"], _chart_complete2);
   main.variable(observer("viewof savedTable")).define("viewof savedTable", ["allData","html","d3"], _savedTable);
   main.variable(observer("savedTable")).define("savedTable", ["Generators", "viewof savedTable"], (G, _) => G.input(_));
-  main.variable(observer()).define(["DOM","allData"], _4);
+  main.variable(observer()).define(["DOM","allData"], _5);
   main.define("initial allData", ["initialDataFromGoogle"], _allData);
   main.variable(observer("mutable allData")).define("mutable allData", ["Mutable", "initial allData"], (M, _) => new M(_));
   main.variable(observer("allData")).define("allData", ["mutable allData"], _ => _.generator);
