@@ -12,9 +12,42 @@ html`<style>
 </style>`
 )}
 
-function _2(html){return(
-html`<h1 id="chart-title" style="text-align:center; font-family: sans-serif;">Alumni Traces</h1>`
-)}
+function _2(html) {
+  return html`
+    <div class="title-wrapper">
+      <h1 id="chart-title">Alumni Traces</h1>
+    </div>
+
+    <style>
+      /* 1. Make the 'box' around the title invisible to clicks */
+      .observablehq:has(#chart-title) {
+        background: transparent !important;
+        pointer-events: none !important; /* Clicks pass through the container */
+        position: relative;
+        z-index: -1; 
+      }
+
+      .title-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        pointer-events: none; /* Clicks pass through the title wrapper */
+      }
+      #chart-title {
+        font-family: sans-serif;
+        margin: 0;
+        padding: 20px;
+        color: #333; 
+        background: transparent;
+      }
+      /* 2. Make sure your CHART container is clickable again */
+      #chart-container {
+        pointer-events: all !important; /* This brings back interactivity to the globe */
+      }
+    </style>
+  `;
+}
 
 function _chart_complete2(world,html,d3,cities,$0,drafting,$1,allData,syncToGoogle,alert,topojson,colorScale)
 {
@@ -22,11 +55,19 @@ function _chart_complete2(world,html,d3,cities,$0,drafting,$1,allData,syncToGoog
   
   // --- CONFIGURATION ---
   const maxK = 150.0; // Change this to set your maximum zoom level
-  const width = window.innerWidth;
-  const height = window.innerHeight - 80;
-  const scaleWidth = (width - 40) / (2 * Math.PI); // 40px padding
-  const scaleHeight = (height - 40) / Math.PI;
-  const dynamicBaseScale = Math.min(scaleWidth, scaleHeight) * 1.41;
+  // const width = window.innerWidth;
+  // const height = window.innerHeight - 80;
+  // const scaleWidth = (width - 40) / (2 * Math.PI); // 40px padding
+  // const scaleHeight = (height - 40) / Math.PI;
+  // const dynamicBaseScale = Math.min(scaleWidth, scaleHeight) * 0.2;
+
+  // 1. Use a more reliable width/height for embedded notebooks
+  const width = document.body.clientWidth || window.innerWidth;
+  const height = (window.innerHeight - 80) || 600;
+
+  // 2. Standard D3 scaling logic:
+  // The 0.9 provides a 10% safety margin so it doesn't touch the edges
+  const dynamicBaseScale = Math.min(width, height) / 2 / Math.PI * 2;
 
   // 1. Setup Persistent State
   const state = (this && this.value) ? this.value : { 
@@ -39,12 +80,15 @@ function _chart_complete2(world,html,d3,cities,$0,drafting,$1,allData,syncToGoog
   const dpr = window.devicePixelRatio || 1;
   
   const container = d3.create("div")
-    .attr("id", "chart-container") // Add this line
-    .style("position", "relative")
-    .style("width", `${width}px`)
-    .style("height", `${height}px`)
-    .style("font-family", "sans-serif")
-    .style("overscroll-behavior", "none");
+      .attr("id", "chart-container")
+      .style("position", "fixed")
+      .style("top", "0")
+      .style("left", "0")
+      .style("width", "100vw")
+      .style("height", "100vh")
+      .style("z-index", "100") // Higher number brings it to the front
+      .style("pointer-events", "none") // Important: allows clicking through to the title
+      .style("background", "transparent"); // Ensure it doesn't have a solid color
 
   // --- Search UI (Inside Canvas) ---
   const searchContainer = container.append("div")
@@ -132,7 +176,7 @@ item.on("click", () => {
   // 3. Trigger the Year Popup at the center of the screen
   // Since we just rotated the city to the center, we open the popup there.
   const centerX = width / 2;
-  const centerY = 250; // Your projection's vertical center
+  const centerY = height / 2 - 80; // Your projection's vertical center
   
   showYearPopupForSearch(centerX, centerY, city);
 });
@@ -152,10 +196,12 @@ item.on("click", () => {
   const context = canvas.node().getContext("2d");
   context.scale(dpr, dpr);
 
+
+  const yOffset = 40; // Adjust this number until the sphere sits perfectly
   // 2. Projection Setup
   let projection = d3.geoMollweide()
     .scale(dynamicBaseScale * state.k) 
-    .translate([width / 2, 250])
+    .translate([width / 2, height / 2 + yOffset])
     .rotate(state.rotation);
 
   // --- UI Components ---
@@ -563,9 +609,6 @@ canvasEl.call(dragHandler);
     event.preventDefault();
     if (clickTimer) { clearTimeout(clickTimer); clickTimer = null; }
     
-    const [mx, my] = d3.pointer(event);
-    const geo = projection.invert([mx, my]);
-    
     if (drafting.points.length < 2) return;
 
     popup.style("display", "block").html(`
@@ -582,7 +625,6 @@ canvasEl.call(dragHandler);
       const d = new Date();
       const timestamp = `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}_${d.getHours()}-${d.getMinutes()}-${d.getSeconds()}`;
       const name = popup.select("#db-name").property("value") || `Unnamed Trace ${timestamp}`;
-      const lastYear = drafting.points[drafting.points.length - 1].year;
       finalizeCurrentLine(name);
       popup.style("display", "none");
     });
@@ -728,7 +770,7 @@ export default function define(runtime, observer) {
   const main = runtime.module();
   function toString() { return this.url; }
   const fileAttachments = new Map([
-    ["worldcities.csv", {url: new URL("./files/fedc9dff008f4b3fb5a4e10c88851f20900d71bcfd50f9d440121ae5b57b598f14da9d21b0a3695a83b047f5c666759020ea7c8d46a00a8232ddf0a5d6685205.csv", import.meta.url), mimeType: "text/csv", toString}]
+    ["worldcities.csv", {url: new URL("./files/data.csv", import.meta.url), mimeType: "text/csv", toString}]
   ]);
   main.builtin("FileAttachment", runtime.fileAttachments(name => fileAttachments.get(name)));
   main.variable(observer("hideUI_Robust")).define("hideUI_Robust", ["html"], _hideUI_Robust);
