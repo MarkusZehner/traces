@@ -1,0 +1,14 @@
+{
+  "name": "@fealumnitraces/alumni-traces",
+  "main": "453171c5d7fc69fc@550.js",
+  "version": "550.0.0",
+  "homepage": "https://observablehq.com/@fealumnitraces/alumni-traces",
+  "author": {
+    "name": "FE Alumni Traces",
+    "url": "https://observablehq.com/@fealumnitraces"
+  },
+  "type": "module",
+  "peerDependencies": {
+    "@observablehq/runtime": "4 - 5"
+  }
+}
