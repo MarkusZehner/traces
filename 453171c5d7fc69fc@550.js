@@ -869,7 +869,7 @@ require("d3@7", "d3-tile@1", "d3-geo@3", "d3-geo-projection@4", "d3-selection@3"
 )}
 
 async function _world(){return(
-(await fetch("https://unpkg.com/world-atlas@2.0.2/countries-10m.json")).json()
+(await fetch("https://unpkg.com/world-atlas@2.0.2/countries-110m.json")).json()
 )}
 
 function _cities(FileAttachment){return(
