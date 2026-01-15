@@ -29,7 +29,7 @@ function _2(html) {
         background: transparent !important;
         pointer-events: none !important;
         position: relative;
-        z-index: -1; 
+        z-index: 10000; 
       }
 
       .title-wrapper {
@@ -59,12 +59,112 @@ function _2(html) {
 
       #chart-container {
         pointer-events: all !important;
+        font-family: sans-serif;
       }
     </style>
   `;
 }
 function _chart_complete2(world,html,d3,cities,$0,drafting,$1,allData,syncToGoogle,alert,topojson,colorScale)
 {
+  const projections = [
+  {name: "Airy’s minimum error", value: d3.geoAiry},
+  {name: "Aitoff", value: d3.geoAitoff},
+  {name: "American polyconic", value: d3.geoPolyconic},
+  {name: "armadillo", value: d3.geoArmadillo},
+  {name: "August", value: d3.geoAugust},
+  {name: "azimuthal equal-area", value: d3.geoAzimuthalEqualArea},
+  {name: "azimuthal equidistant", value: d3.geoAzimuthalEquidistant},
+  {name: "Baker dinomic", value: d3.geoBaker},
+  {name: "Berghaus’ star", value: d3.geoBerghaus},
+  {name: "Bertin’s 1953", value: d3.geoBertin1953},
+  {name: "Boggs’ eumorphic", value: d3.geoBoggs},
+  {name: "Boggs’ eumorphic (interrupted)", value: d3.geoInterruptedBoggs},
+  {name: "Bonne", value: d3.geoBonne},
+  {name: "Bottomley", value: d3.geoBottomley},
+  {name: "Bromley", value: d3.geoBromley},
+  {name: "Butterfly (gnomonic)", value: d3.geoPolyhedralButterfly},
+  {name: "Butterfly (Collignon)", value: d3.geoPolyhedralCollignon},
+  {name: "Butterfly (Waterman)", value: d3.geoPolyhedralWaterman},
+  {name: "Collignon", value: d3.geoCollignon},
+  // {name: "conic conformal", value: d3.geoConicConformal}, // Not suitable for world maps.
+  {name: "conic equal-area", value: d3.geoConicEqualArea},
+  {name: "conic equidistant", value: d3.geoConicEquidistant},
+  {name: "Craig retroazimuthal", value: d3.geoCraig},
+  {name: "Craster parabolic", value: d3.geoCraster},
+  {name: "cylindrical equal-area", value: d3.geoCylindricalEqualArea},
+  {name: "cylindrical stereographic", value: d3.geoCylindricalStereographic},
+  {name: "Eckert I", value: d3.geoEckert1},
+  {name: "Eckert II", value: d3.geoEckert2},
+  {name: "Eckert III", value: d3.geoEckert3},
+  {name: "Eckert IV", value: d3.geoEckert4},
+  {name: "Eckert V", value: d3.geoEckert5},
+  {name: "Eckert VI", value: d3.geoEckert6},
+  {name: "Eisenlohr conformal", value: d3.geoEisenlohr},
+  {name: "Equal Earth", value: d3.geoEqualEarth},
+  {name: "Equirectangular (plate carrée)", value: d3.geoEquirectangular},
+  {name: "Fahey pseudocylindrical", value: d3.geoFahey},
+  {name: "flat-polar parabolic", value: d3.geoMtFlatPolarParabolic},
+  {name: "flat-polar quartic", value: d3.geoMtFlatPolarQuartic},
+  {name: "flat-polar sinusoidal", value: d3.geoMtFlatPolarSinusoidal},
+  {name: "Foucaut’s stereographic equivalent", value: d3.geoFoucaut},
+  {name: "Foucaut’s sinusoidal", value: d3.geoFoucautSinusoidal},
+  {name: "general perspective", value: d3.geoSatellite},
+  {name: "Gilbert’s two-world", value: d3.geoGilbert},
+  {name: "Gingery", value: d3.geoGingery},
+  {name: "Ginzburg V", value: d3.geoGinzburg5},
+  {name: "Ginzburg VI", value: d3.geoGinzburg6},
+  {name: "Ginzburg VIII", value: d3.geoGinzburg8},
+  {name: "Ginzburg IX", value: d3.geoGinzburg9},
+  {name: "Goode’s homolosine", value: d3.geoHomolosine},
+  {name: "Goode’s homolosine (interrupted)", value: d3.geoInterruptedHomolosine},
+  {name: "gnomonic", value: d3.geoGnomonic},
+  {name: "Gringorten square", value: d3.geoGringorten},
+  {name: "Gringorten quincuncial", value: d3.geoGringortenQuincuncial},
+  {name: "Guyou square", value: d3.geoGuyou},
+  {name: "Hammer", value: d3.geoHammer},
+  {name: "Hammer retroazimuthal", value: d3.geoHammerRetroazimuthal},
+  {name: "HEALPix", value: d3.geoHealpix},
+  {name: "Hill eucyclic", value: d3.geoHill},
+  {name: "Hufnagel pseudocylindrical", value: d3.geoHufnagel},
+  {name: "Kavrayskiy VII", value: d3.geoKavrayskiy7},
+  {name: "Lagrange conformal", value: d3.geoLagrange},
+  {name: "Larrivée", value: d3.geoLarrivee},
+  {name: "Laskowski tri-optimal", value: d3.geoLaskowski},
+  // {name: "Littrow retroazimuthal", value: d3.geoLittrow}, // Not suitable for world maps.
+  {name: "Loximuthal", value: d3.geoLoximuthal},
+  {name: "Mercator", value: d3.geoMercator},
+  {name: "Miller cylindrical", value: d3.geoMiller},
+  {name: "Mollweide", value: d3.geoMollweide},
+  {name: "Mollweide (Goode’s interrupted)", value: d3.geoInterruptedMollweide},
+  {name: "Mollweide (interrupted hemispheres)", value: d3.geoInterruptedMollweideHemispheres},
+  {name: "Natural Earth", value: d3.geoNaturalEarth1},
+  {name: "Natural Earth II", value: d3.geoNaturalEarth2},
+  {name: "Nell–Hammer", value: d3.geoNellHammer},
+  {name: "Nicolosi globular", value: d3.geoNicolosi},
+  {name: "orthographic", value: d3.geoOrthographic},
+  {name: "Patterson cylindrical", value: d3.geoPatterson},
+  {name: "Peirce quincuncial", value: d3.geoPeirceQuincuncial},
+  {name: "rectangular polyconic", value: d3.geoRectangularPolyconic},
+  {name: "Robinson", value: d3.geoRobinson},
+  {name: "sinusoidal", value: d3.geoSinusoidal},
+  {name: "sinusoidal (interrupted)", value: d3.geoInterruptedSinusoidal},
+  {name: "sinu-Mollweide", value: d3.geoSinuMollweide},
+  {name: "sinu-Mollweide (interrupted)", value: d3.geoInterruptedSinuMollweide},
+  {name: "stereographic", value: d3.geoStereographic},
+  {name: "Times", value: d3.geoTimes},
+  {name: "Tobler hyperelliptical", value: d3.geoHyperelliptical},
+  {name: "transverse Mercator", value: d3.geoTransverseMercator},
+  {name: "Van der Grinten", value: d3.geoVanDerGrinten},
+  {name: "Van der Grinten II", value: d3.geoVanDerGrinten2},
+  {name: "Van der Grinten III", value: d3.geoVanDerGrinten3},
+  {name: "Van der Grinten IV", value: d3.geoVanDerGrinten4},
+  {name: "Wagner IV", value: d3.geoWagner4},
+  {name: "Wagner VI", value: d3.geoWagner6},
+  {name: "Wagner VII", value: d3.geoWagner7},
+  {name: "Werner", value: () => d3.geoBonne().parallel(90)},
+  {name: "Wiechel", value: d3.geoWiechel},
+  {name: "Winkel tripel", value: d3.geoWinkel3}
+  ];
   if (!world) return html`Waiting for world data...`;
   
   // --- CONFIGURATION ---
@@ -138,6 +238,36 @@ function _chart_complete2(world,html,d3,cities,$0,drafting,$1,allData,syncToGoog
     .style("overflow-y", "auto")
     .style("display", "none"); // Hidden by default
 
+  // --- Control Container (Add to your existing searchContainer) ---
+  const controls = searchContainer.append("div")
+    .style("display", "flex")
+    .style("flex-direction", "column")
+    .style("gap", "10px")
+    .style("align-items", "flex-end");
+
+  // Move searchInput into this new 'controls' div if you haven't already
+  controls.append(() => searchInput.node()); 
+
+  const projectionSelector = controls.append("select")
+    .style("padding", "5px")
+    .style("border-radius", "10px")
+    .style("border", "1px solid #ccc")
+    .style("background", "white")
+    .style("font-size", "12px")
+    .style("outline", "none")
+    .style("cursor", "pointer");
+
+  // Populate using your specific list
+    projections.forEach((p, i) => {
+      projectionSelector.append("option")
+        .text(p.name)
+        .attr("value", i); // Store the index to retrieve the function later
+    });
+
+    // Set default to Mollweide (find it in your list)
+    const mollIndex = projections.findIndex(p => p.name === "Mollweide");
+    projectionSelector.property("value", state.projectionIndex ?? mollIndex);
+
 // --- Search Logic ---
   searchInput.on("input", function(event) {
     const value = event.target.value.toLowerCase().trim();
@@ -210,12 +340,10 @@ item.on("click", () => {
   const context = canvas.node().getContext("2d");
   context.scale(dpr, dpr);
 
-
-  const yOffset = 0; // Adjust this number until the sphere sits perfectly
-  // 2. Projection Setup
-  let projection = d3.geoMollweide()
+  let currentProjIndex = projections.findIndex(p => p.name === "Mollweide");
+  let projection = projections[currentProjIndex].value()
     .scale(dynamicBaseScale * state.k) 
-    .translate([width / 2, height / 2 + yOffset])
+    .translate([width / 2, height / 2])
     .rotate(state.rotation);
 
   // --- UI Components ---
@@ -258,7 +386,10 @@ item.on("click", () => {
   // Cancel Button
   popup.select("#btn-cancel-search").on("click", (e) => {
     e.stopPropagation();
+    drafting.points = [];
+    $0.value.points = [];
     popup.style("display", "none");
+    render();
   });
 }
   
@@ -500,40 +631,50 @@ const zoomHandler = d3.zoom()
   
   // Also prevent touch-scrolling on mobile
   canvasRaw.style.touchAction = 'none';
-  
-  // 3. Update your Slider logic inside the Drag Handler
-  // We need to tell the zoomHandler to update its internal scale 
-  // when you manually move the slider.
-// 3. Update the Drag Handler to sync back to the Zoom state
-const dragHandler = d3.drag()
-  .on("start", (event) => {
-    isDraggingSlider = (
-      event.y > slider.y - 20 && event.y < slider.y + 20 && 
-      event.x > slider.x - 10 && event.x < slider.x + slider.width + 10
-    );
-  })
-  .on("drag", (event) => {
-    if (isDraggingSlider) {
-      let pct = Math.max(0, Math.min(1, (event.x - slider.x) / slider.width));
-      state.k = 1.0 + pct * (maxK - 1.0);
-      
-      // CRITICAL: Keep d3.zoom in sync with the slider
-      canvasEl.property("__zoom", d3.zoomIdentity.scale(state.k));
-      
-      projection.scale(dynamicBaseScale * state.k);
-    } else {
-      // Rotation logic
-      state.rotation[0] += event.dx * (0.4 / state.k);
-      state.rotation[1] -= event.dy * (0.4 / state.k);
-      projection.rotate(state.rotation);
-    }
-    render();
-  })
-  .on("end", () => { isDraggingSlider = false; });
 
-canvasEl.call(dragHandler);
+  // 3. Update the Drag Handler to sync back to the Zoom state
+  const dragHandler = d3.drag()
+    .on("start", (event) => {
+      isDraggingSlider = (
+        event.y > slider.y - 20 && event.y < slider.y + 20 && 
+        event.x > slider.x - 10 && event.x < slider.x + slider.width + 10
+      );
+    })
+    .on("drag", (event) => {
+      if (isDraggingSlider) {
+        let pct = Math.max(0, Math.min(1, (event.x - slider.x) / slider.width));
+        state.k = 1.0 + pct * (maxK - 1.0);
+        
+        // CRITICAL: Keep d3.zoom in sync with the slider
+        canvasEl.property("__zoom", d3.zoomIdentity.scale(state.k));
+        
+        projection.scale(dynamicBaseScale * state.k);
+      } else {
+        // Rotation logic
+        state.rotation[0] += event.dx * (0.4 / state.k);
+        state.rotation[1] -= event.dy * (0.4 / state.k);
+        projection.rotate(state.rotation);
+      }
+      render();
+    })
+    .on("end", () => { isDraggingSlider = false; });
+
+  canvasEl.call(dragHandler);
 
   // --- Events ---
+  projectionSelector.on("change", function() {
+      const idx = +this.value;
+      const selectedProj = projections[idx];
+      
+      // Create new projection from the selected function
+      projection = selectedProj.value()
+        .scale(dynamicBaseScale * state.k)
+        .translate([width / 2, height / 2])
+        .rotate(state.rotation);
+
+      render();
+    });
+
   let clickTimer = null;
 
   container.on("click", (event) => {
@@ -585,14 +726,27 @@ canvasEl.call(dragHandler);
       popup.select("#btn-add-point").on("click", (e) => {
         e.stopPropagation();
         const year = +popup.select("#in-year").property("value");
-        $0.value.points = [...drafting.points, { geo, year }];
+        
+        // 1. Update the local drafting object so render() sees it immediately
+        drafting.points.push({ geo, year });
+        
+        // 2. Sync with the mutable value WITHOUT triggering a re-run if possible
+        // In many exports, simple assignment to the property works:
+        $0.value.points = [...drafting.points]; 
+
         popup.style("display", "none");
-        render();
+        render(); // Manually redraw so the change is instant
       });
 
       popup.select("#btn-undo-point").on("click", (e) => {
         e.stopPropagation();
-        $0.value.points = drafting.points.slice(0, -1);
+        
+        // Remove the last point locally
+        drafting.points.pop();
+        
+        // Sync back
+        $0.value.points = [...drafting.points];
+
         popup.style("display", "none");
         render();
       });
@@ -609,7 +763,8 @@ canvasEl.call(dragHandler);
 
       popup.select("#btn-cancel").on("click", (e) => {
         e.stopPropagation();
-        $0.value = { points: [] };
+        drafting.points = [];
+        $0.value.points = [];
         popup.style("display", "none");
         render();
       });
@@ -645,7 +800,8 @@ canvasEl.call(dragHandler);
 
     popup.select("#db-cancel").on("click", (e) => {
       e.stopPropagation();
-      $0.value = { points: [] };
+      drafting.points = [];
+      $0.value.points = [];
       popup.style("display", "none");
       render();
     });
