@@ -365,11 +365,43 @@ item.on("click", () => {
     .html(`
       <div style="margin-bottom:8px"><strong>Confirm Year</strong></div>
       <div style="font-size:11px; color:#666; margin-bottom:5px;">Adding: ${city.name}</div>
-      <input type="number" id="search-year" value="2026" style="width:60px; margin-bottom:10px;">
-      <br>
-      <button id="btn-confirm-search" style="width:100%; background:#007bff; color:white; border:none; padding:6px; border-radius:4px; cursor:pointer;">Add to Trip</button>
-      <button id="btn-cancel-search" style="width:100%; margin-top:4px; background:none; border:none; color:gray; font-size:11px; cursor:pointer">Cancel</button>
+      <input type="number" id="search-year" placeholder="YYYY" style="width:60px; margin-bottom:10px;">
+  <br>
+  
+  <button id="btn-confirm-search" 
+          disabled 
+          style="width:100%; background:#ccc; color:white; border:none; padding:6px; border-radius:4px; cursor:not-allowed;">
+    Add to Trace
+  </button>
+  
+  <button id="btn-cancel-search" style="width:100%; margin-top:4px; background:none; border:none; color:gray; font-size:11px; cursor:pointer">
+    Cancel
+  </button>
     `);
+
+const yearInput = popup.select("#search-year");
+const confirmBtn = popup.select("#btn-confirm-search");
+
+yearInput.on("input", function() {
+    if (this.value === "1" || this.value === "-1") {
+        this.value = 2000;
+    }
+    const val = this.value;
+
+    if (val && val.trim() !== "") {
+        // ENABLE the button
+        confirmBtn
+        .attr("disabled", null)
+        .style("background", "#007bff")
+        .style("cursor", "pointer");
+    } else {
+        // DISABLE the button
+        confirmBtn
+        .attr("disabled", true)
+        .style("background", "#ccc")
+        .style("cursor", "not-allowed");
+}
+});
 
   // Confirm Button
   popup.select("#btn-confirm-search").on("click", (e) => {
@@ -698,8 +730,16 @@ const zoomHandler = d3.zoom()
       // 1. Set HTML content
       popup.html(`
         <div style="margin-bottom:8px"><b>Point #${drafting.points.length + 1}</b></div>
-        Year: <input type="number" id="in-year" value="2026" style="width:60px; margin-bottom:10px;"><br>
-        <button id="btn-add-point" style="width:100%; margin-bottom:4px; font-weight:bold;">Add Point</button>
+        Year: <input type="number" id="in-year" placeholder="YYYY" style="width:60px; margin-bottom:10px;"><br>
+        <button 
+            id="btn-add-point" 
+            style="width:100%; 
+            margin-bottom:4px; 
+            font-weight:bold; 
+            background:#ccc; 
+            cursor:not-allowed; border:none; color:white; padding:6px; border-radius:4px;">
+        Add Point
+        </button>
         ${drafting.points.length > 0 ? `
           <button id="btn-undo-point" style="width:100%; margin-bottom:4px; background:#ffc107; border:1px solid #e0a800; border-radius:4px; padding:4px; cursor:pointer;">↺ Undo Last Point</button>
         ` : ''}
@@ -710,6 +750,29 @@ const zoomHandler = d3.zoom()
         ` : ''}
         <button id="btn-cancel" style="width:100%; margin-top:4px; background:none; border:none; color:gray; font-size:11px; cursor:pointer">Cancel Trace</button>
       `);
+
+    const yearIn = popup.select("#in-year");
+    const addBtn = popup.select("#btn-add-point");
+
+    yearIn.on("input", function() {
+        // 1. Intercept the 'up/down' click on an empty field
+        // If the value is 1 (up) or -1 (down), it means the stepper was clicked while empty
+        if (this.value === "1" || this.value === "-1") {
+            this.value = 2000;
+        }
+        const val = this.value;
+        if (val && val.trim().length >= 4) { // Requires at least 4 digits
+            addBtn
+            .attr("disabled", null)
+            .style("background", "#007bff")
+            .style("cursor", "pointer");
+        } else {
+            addBtn
+            .attr("disabled", true)
+            .style("background", "#ccc")
+            .style("cursor", "not-allowed");
+        }
+    });
 
       // 2. Position Clamping (Inside the timer)
       const pNode = popup.node();
