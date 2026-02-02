@@ -406,7 +406,7 @@ item.on("click", () => {
       newLinks.push({
         source: finalPoints[i].geo,
         target: finalPoints[i+1].geo,
-        year: finalPoints[i+1].year, // This can now be your [year0, year1] array
+        year: [finalPoints[i].year, finalPoints[i+1].year], // This can now be your [year0, year1] array
         name: tripName
       });
     }

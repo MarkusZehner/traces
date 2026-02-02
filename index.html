@@ -1,15 +1,26 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-<title>Alumni traces</title>
-<link rel="stylesheet" type="text/css" href="./inspector.css">
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumni Traces</title>
+    <link rel="stylesheet" type="text/css" href="./inspector.css">
+    <style>
+        /* Optional: Ensure the body takes up the full screen for your map */
+        body { margin: 0; padding: 0; overflow: hidden; }
+    </style>
+</head>
 <body>
-<script type="module">
 
-import define from "./index.js?v=1";
-// import define from "./index.js";
-import {Runtime, Library, Inspector} from "./runtime.js";
+    <script type="module">
+        import define from "./index.js?v=1";
+        import {Runtime, Library, Inspector} from "./runtime.js";
 
-const runtime = new Runtime();
-const main = runtime.module(define, Inspector.into(document.body));
+        const runtime = new Runtime();
+        // This targets document.body; the Inspector will now 
+        // find a proper body tag to render into.
+        const main = runtime.module(define, Inspector.into(document.body));
+    </script>
 
-</script>
+</body>
+</html>
